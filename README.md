@@ -26,7 +26,7 @@ The following open-source projects were used to develop artjoker-admin-panel:
 ## Setup:
 - You can  Clone this repository. 
 ``` bash
-git clone https://git.artjoker.ua/javascript/admin-panel-backend.git .
+git clone https://github.com/artjoker/admin-panel-backend.git
 ```
 - Install and run PostgreSQL on your system or provide a remote connection string.
 - Install dependencies
@@ -60,7 +60,7 @@ npm test
 
 ## Code Style:
  
-Will run ESLint to check the code complience to the [AirBnB](https://github.com/airbnb/javascript) code style.
+If you want to enforce a specific code style, you can run [ESLint](https://eslint.org/docs/latest/rules/) with your desired configuration. This project follows a standard JavaScript code style.
 ```bash
 yarn run lint
 
