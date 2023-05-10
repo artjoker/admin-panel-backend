@@ -1,0 +1,1 @@
+export { ModelDTO } from './model';

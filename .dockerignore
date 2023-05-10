@@ -1,0 +1,24 @@
+/.*
+/docker
+!/docker/deploy
+!/docker/yml
+!/docker/sh
+*docker*.yml
+*gitlab-ci*yml
+README.md
+tests
+
+# Git
+**/.gitignore
+
+# etc.
+**/.DS_Store
+
+### TEMPORARY
+# /docs
+**/*node_modules
+# package.json
+# yarn.lock
+!/node_modules
+
+*.md

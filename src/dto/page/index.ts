@@ -1,0 +1,11 @@
+export { PageDTO } from './page';
+export { CreatePageDTO } from './create-page';
+export { UpdatePageDTO } from './update-page';
+export { DeletePageDTO } from './delete-page';
+export { GetPageBySlugDTO } from './get-page-by-slug';
+export { GetPageByIdDTO } from './get-page-by-id';
+export { GetPageChildrenDTO } from './get-page-children';
+export { UploadImageDTO } from './upload-image';
+export { RoutesDTO } from './routes-page';
+export { ChildrenDTO } from './children';
+export { CheckPageExistDTO } from './check-page-exist';

@@ -1,0 +1,1379 @@
+# -----------------------------------------------------------------------------
+
+openapi: 3.0.3
+
+# -----------------------------------------------------------------------------
+
+info:
+  title: Artjoker-Admin-Panel
+  version: 1.0.0
+
+# -----------------------------------------------------------------------------
+
+externalDocs:
+  description: Find out more about "Artjoker"
+  url: https://artjoker.net/
+
+# -----------------------------------------------------------------------------
+
+security: 
+# Apply the security globally to all operations
+  - bearerAuth: []
+
+# -----------------------------------------------------------------------------
+
+servers:
+  - url: http://localhost:3000/
+    description: Development server
+  - url: https://dev.api.admin-panel.myapp.com.ua/
+    description: Production server
+  - url: https://stage.api.admin-panel.myapp.com.ua/
+    description: Stage server
+# -----------------------------------------------------------------------------
+
+tags:
+  - name: Auth (admin)
+    description: for userRole.ADMIN only
+  - name: Users (admin)
+    description: for userRole.ADMIN only
+  - name: Pages (admin)
+    description: for userRole.ADMIN only
+  - name: Auth (public)
+    description: for userRole.ADMIN & userRole.USER
+  - name: Pages (public)
+    description: for userRole.ADMIN & userRole.USER
+# -----------------------------------------------------------------------------
+
+components:
+
+  # ___EXAMPLES
+  # examples:
+    # tokenExample:
+    #   value:
+    #     token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVmNTk3NTViLWVkMzMtNGZhZC1hNDU4LTQ0MmUyOTk0NDA5MCIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY4MDg2NDUxOH0.iG3IjjbePiBlc6qzsUWQoa_EbAqONRhzDrBCcqaJ-Jo
+
+  # ___HEADERS
+  headers: {}
+  
+  # ___PARAMETERS
+  parameters: {}
+  
+  # ___REQUEST_BODIES
+  requestBodies: {}
+  
+  # ___RESPONSES
+  responses: {}
+  
+  # ___SCHEMAS
+  schemas:
+
+    # ________________________________TokenJWT (response)
+    TokenJWT:
+      type: object
+      properties:
+        token:
+          type: string
+          format: jwt token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVmNTk3NTViLWVkMzMtNGZhZC1hNDU4LTQ0MmUyOTk0NDA5MCIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY4MDg2NDUxOH0.iG3IjjbePiBlc6qzsUWQoa_EbAqONRhzDrBCcqaJ-Jo
+      required:
+        - token
+      additionalProperties: false
+  
+    # ________________________________LoginDTO (request)
+    LoginDTO:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@admin.com
+        password:
+          type: string
+          format: password
+          minimum: 4
+          maximum: 100
+          description: should not contain space
+          example: Qwerty12345
+      required:
+        - email
+        - password
+      additionalProperties: false
+    
+    # ________________________________RegisterDTO (request)
+    RegisterDTO:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minimum: 1
+          maximum: 100
+          example: Adam
+        lastName:
+          type: string
+          minimum: 1
+          maximum: 100
+          example: Smith
+        email:
+          type: string
+          format: email
+          example: adam@gmail.com
+        password:
+          type: string
+          format: password
+          minimum: 4
+          maximum: 100
+          description: should not contain space
+          example: qwerty123
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      additionalProperties: false
+      
+    # ________________________________CreateUserDTO (request)
+    CreateUserDTO:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minimum: 1
+          maximum: 100
+          example: Adam
+        lastName:
+          type: string
+          minimum: 1
+          maximum: 100
+          example: Smith
+        email:
+          type: string
+          format: email
+          example: adam@gmail.com
+        password:
+          type: string
+          format: password
+          minimum: 4
+          maximum: 100
+          description: should not contain space
+          example: qwerty123
+        isActive:
+          type: boolean
+          example: true
+        role:
+          type: string
+          default: User
+          enum:
+            - Admin
+            - User
+          example: User
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - isActive
+      additionalProperties: false
+      
+    # ________________________________UserDTO (response)
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d1420ca8-8378-4830-b018-9065f52a1336
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-04-08T20:21:46.881Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-04-08T20:22:48.881Z
+        firstName:
+          type: string
+          example: Adam
+        lastName:
+          type: string
+          example: Smith
+        email:
+          type: string
+          format: email
+          example: adam@gmail.com
+        isActive:
+          type: boolean
+          example: true
+        role:
+          type: string
+          default: User
+          enum:
+            - Admin
+            - User
+          example: User
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - firstName
+        - lastName
+        - email
+        - isActive
+        - role
+      additionalProperties: false
+    
+    # ________________________________FindUsersDTO (request)
+    FindUsersDTO:
+      type: object
+      properties:
+        page:
+          type: number
+          example: 1
+        perPage:
+          type: number
+          example: 10
+        sort:
+          $ref: '#/components/schemas/SortDTO'
+        filters:
+          $ref: '#/components/schemas/FiltersDTO'
+        search:
+          type: string
+          example: adam
+          description: search in firstName or lastName or email
+      required:
+        - page
+        - perPage
+      additionalProperties: false
+    
+    # ________________________________SortDTO (request)
+    SortDTO:
+      type: object
+      properties:
+        firstName:
+          type: string
+          enum:
+            - ASC
+            - DESC
+          example: ASC
+          description: >
+            Sort order:
+              * ASC - Ascending, from A to Z.
+              * DESC - Descending, from Z to A.
+        lastName:
+          type: string
+          enum:
+            - ASC
+            - DESC
+          example: DESC
+          description: >
+            Sort order:
+              * ASC - Ascending, from A to Z.
+              * DESC - Descending, from Z to A.
+        email:
+          type: string
+          enum:
+            - ASC
+            - DESC
+          example: ASC
+          description: >
+            Sort order:
+              * ASC - Ascending, from A to Z.
+              * DESC - Descending, from Z to A.
+      additionalProperties: false
+      
+    # ________________________________FiltersDTO (request)
+    FiltersDTO:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: Adam
+        lastName:
+          type: string
+          example: Smith
+        email:
+          type: string
+          format: email
+          example: adam@gmail.com
+        isActive:
+          type: boolean
+          example: true
+      additionalProperties: false
+    
+    # ________________________________FindUsersResponseDTO (response)
+    FindUsersResponseDTO:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDTO'
+        page:
+          type: number
+          example: 1
+        perPage:
+          type: number
+          example: 10
+        totalPages:
+          type: number
+          example: 1
+      additionalProperties: false
+
+    # ________________________________UpdateUserDTO (request)
+    UpdateUserDTO:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minimum: 1
+          maximum: 100
+          example: Adam
+        lastName:
+          type: string
+          minimum: 1
+          maximum: 100
+          example: Smith
+        email:
+          type: string
+          format: email
+          example: adam@gmail.com
+        password:
+          type: string
+          format: password
+          minimum: 4
+          maximum: 100
+          description: should not contain space
+          example: qwerty123
+        isActive:
+          type: boolean
+          description: for Admin only
+          example: true
+      additionalProperties: false
+      
+    # ________________________________ModelDTO (response)
+    ModelDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: undefined if page has been removed
+          example: 988fbf8d-66a4-4713-afc8-c5f80756a54b
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-04-05T18:06:23.748Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-04-05T18:06:25.748Z
+      required:
+        - id
+        - createdAt
+        - updatedAt
+      additionalProperties: false
+      
+    # ________________________________PageDTO (response)
+    PageDTO:
+      allOf:
+        - $ref: '#/components/schemas/ModelDTO'
+        - type: object
+          properties:
+            title:
+              $ref: '#/components/schemas/MultiLangDTO'
+            urlSlug:
+              type: string
+              example: contacts-1
+            publishedAt:
+              type: string
+              format: date-time
+              nullable: true
+              example: 2023-04-09T16:15:41.590Z
+            content:
+              $ref: '#/components/schemas/MultiLangDTO'
+            sort:
+              type: number
+              example: 1
+            parent:
+              $ref: '#/components/schemas/PageDTO'
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/PageDTO'
+              minItems: 0
+            isActive:
+              type: boolean
+              example: true
+            pageType:
+              type: string
+              default: template
+              enum:
+                - template
+                - home
+                - contacts
+                - blog
+                - article
+              example: blog
+            images:
+              type: array
+              items:
+                $ref: '#/components/schemas/ImageDTO'
+          required:
+            - title
+            - urlSlug
+            - sort
+            - children
+            - isActive
+            - pageType
+          additionalProperties: false 
+    
+    # ________________________________MultiLangDTO (response)      
+    MultiLangDTO:
+      type: object
+      properties:
+        en:
+          type: string
+          example: Some title or content
+        uk:
+          type: string
+          example: Якийсь заголовок або зміст
+        ru:
+          type: string
+          example: Какой-то заголовок или содержание
+      required:
+        - en
+        - uk
+        - ru
+      additionalProperties: false
+      
+      
+    # ________________________________RoutesDTO (response)
+    RoutesDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 15748d0b-d8d6-4e69-b88b-986e593549b7
+        title:
+          $ref: '#/components/schemas/MultiLangDTO'
+        urlSlug:
+          type: string
+          example: contacts-1
+        sort:
+          type: number
+          example: 1
+        parent:
+          $ref: '#/components/schemas/RoutesDTO'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoutesDTO'
+        pageType:
+          type: string
+          enum:
+            - template
+            - home
+            - contacts
+            - blog
+            - article
+          example: blog
+      required:
+        - id
+        - title
+        - urlSlug
+        - sort
+        - children
+        - pageType
+      additionalProperties: false 
+      
+    # ________________________________GetPageByIdDTO (request)
+    GetPageByIdDTO:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 15748d0b-d8d6-4e69-b88b-986e593549b7
+      required:
+        - id
+      additionalProperties: false 
+      
+    # ________________________________GetPageBySlugDTO (request)
+    GetPageBySlugDTO:
+      properties:
+        slug:
+          type: string
+          example: blog
+      required:
+        - slug
+      additionalProperties: false
+      
+    # ________________________________GetPageChildrenDTO (request)
+    GetPageChildrenDTO:
+      properties:
+        slug:
+          type: string
+          example: blog
+        page:
+          type: integer
+          format: int
+          example: 1
+        perPage:
+          type: integer
+          format: int
+          example: 10
+      required:
+        - slug
+      additionalProperties: false  
+    
+    # ________________________________ChildrenDTO (response)
+    ChildrenDTO:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageDTO'
+        page:
+          type: integer
+          format: int
+          example: 1
+        perPage:
+          type: integer
+          format: int
+          example: 10
+        totalPages:
+          type: integer
+          format: int
+          example: 100
+      required:
+        - data
+        - page
+        - perPage
+        - totalPages
+      additionalProperties: false    
+      
+    # ________________________________DeletePageDTO (request)
+    DeletePageDTO:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 15748d0b-d8d6-4e69-b88b-986e593549b7
+      required:
+        - id
+      additionalProperties: false 
+    
+    # ________________________________CreatePageDTO (request)
+    CreatePageDTO:
+      type: object
+      properties:
+        title:
+          $ref: '#/components/schemas/MultiLangDTO'
+        urlSlug:
+          type: string
+          minimum: 2
+          maximum: 40
+          pattern: '^[a-z][a-z0-9-]*$'
+          example: contacts-1
+        publishedAt:
+          type: string
+          format: date-time
+          example: 2023-04-09T16:15:41.590Z
+        content:
+          $ref: '#/components/schemas/MultiLangDTO'
+        sort:
+          type: number
+          example: 1
+        parentId:
+          type: string
+          format: uuid
+          example: 15748d0b-d8d6-4e69-b88b-986e593549b7
+        isActive:
+          type: boolean
+          example: true 
+          default: false
+      required:
+        - title
+        - urlSlug
+        - sort
+      additionalProperties: false
+      
+    # ________________________________UpdatePageDTO (request)
+    UpdatePageDTO:
+      type: object
+      properties:
+        title:
+          $ref: '#/components/schemas/MultiLangDTO'
+        urlSlug:
+          type: string
+          minimum: 2
+          maximum: 40
+          pattern: '^[a-z][a-z0-9-]*$'
+          example: contacts-1
+        publishedAt:
+          type: string
+          format: date-time
+          example: 2023-04-09T16:15:41.590Z
+        content:
+          $ref: '#/components/schemas/MultiLangDTO'
+        sort:
+          type: number
+          example: 1
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+          example: 636bde48-e46c-4b79-9646-41730836e7a5
+        isActive:
+          type: boolean
+          example: true 
+        pageType:
+          type: string
+          enum:
+            - template
+            - home
+            - contacts
+            - blog
+            - article
+          example: blog
+        images:
+          type: array
+          items:
+            type: string
+            example: 1681760142159imagename.jpeg
+      additionalProperties: false
+      
+    # ________________________________UploadImageDTO (request)
+    UploadImageDTO:
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: page ID (request params))
+          example: 39bcf9d6-eacc-4483-8cbd-2c5cd53c3608
+        image:
+          type: string
+          example: 1681756570936imagename.jpeg
+      required:
+        - id
+        - image
+      additionalProperties: false 
+      
+    # ________________________________ImageDTO (response)
+    ImageDTO:
+      properties:
+        id:
+          type: string
+          example: 1681756570936imagename.jpeg
+        url:
+          type: string
+          example: http://localhost:3000/storage/1681756570936imagename.jpeg
+      required:
+        - id
+        - url
+      additionalProperties: false 
+      
+  # ___SECURITY_SCHEMAS
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+      description: Use `JWT token` as the test credentials
+
+# -----------------------------------------------------------------------------
+
+paths:
+  # +++++++++++++++++++++++++++++++ A D M I N +++++++++++++++++++++++++++++++++
+  
+  # ---------------------------- Login User (admin) ---------------------------
+  /admin/auth/login:
+    post:
+      operationId: Login (Admin only)
+      summary: Login user
+      tags:
+        - Auth (admin)
+      security: []
+      parameters: []
+      
+      requestBody:
+        required: true
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDTO'
+              
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenJWT'
+              # examples:
+              #   tokenExample:
+              #     $ref: '#/components/schemas/TokenJWT'
+        '400':
+          description: Invalid request
+        '401':
+          description: Wrong password
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: User with email [`email`] does not exist
+        '500':
+          description: Internal server error
+  
+  # ---------------------------- Create user (admin) --------------------------
+  /admin/users:
+    post:
+      operationId: Create user (admin)
+      summary: Create user
+      tags:
+        - Users (admin)
+      security:
+        - bearerAuth: []
+      parameters: []
+      
+      requestBody:
+        required: true
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDTO'
+              
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Invalid request OR 
+                       User with email [`email`] already exists 
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Get all users (admin) -------------------------
+  /admin/users/find:
+    post:
+      operationId: Get users (admin)
+      summary: Get all users
+      tags:
+        - Users (admin)
+      security:
+        - bearerAuth: []
+      parameters: []
+      
+      requestBody:
+        required: true
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindUsersDTO'
+              
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindUsersResponseDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Get user by ID (admin) ------------------------
+  /admin/users/{userID}:
+    get:
+      operationId: Get user by ID (admin)
+      summary: Get user by ID
+      tags:
+        - Users (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userID
+          in: path
+          description: ID of the user to return
+          required: true
+          example: 988fbf8d-66a4-4713-afc8-c5f80756a54b
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: User with id - [`id`] does not exist",
+        '500':
+          description: Internal server error
+          
+    #---------------------------- Update user (admin) -------------------------
+    patch:
+      operationId: Update user (admin)
+      summary: Update user
+      tags:
+        - Users (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userID
+          in: path
+          description: ID of the user to update
+          required: true
+          example: 988fbf8d-66a4-4713-afc8-c5f80756a54b
+          schema:
+            type: string
+            format: uuid
+            
+      requestBody:
+        required: false
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDTO'
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: User with id - [`id`] does not exist",
+        '500':
+          description: Internal server error
+          
+    #---------------------------- Delete user by ID (admin) -------------------
+    delete:
+      operationId: Delete user by ID (admin)
+      summary: Delete user by ID
+      tags:
+        - Users (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userID
+          in: path
+          description: ID of the user to delete
+          required: true
+          example: 319496d8-7d74-4c63-a191-5e9a3254244d
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: User with id - [`id`] does not exist
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Get all pages (admin) ------------------------ 
+  /admin/pages:
+    get:
+      operationId: Get all pages (admin)
+      summary: Get all pages
+      description: Get Active & Inactive pages
+      tags:
+        - Pages (admin)
+      security:
+        - bearerAuth: []
+      parameters: []
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PageDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '500':
+          description: Internal server error
+          
+    #---------------------------- Create page (admin) ------------------------
+    post:
+      operationId: Create page (admin)
+      summary: Create page
+      tags:
+        - Pages (admin)
+      security:
+        - bearerAuth: []
+      parameters: []
+      
+      requestBody:
+        required: true
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePageDTO'
+              
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: Parent page with such id (`parentId`) does not exist
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Get page by ID (admin) -----------------------
+  /admin/pages/{pageId}:
+    get:
+      operationId: Get page by ID (admin)
+      summary: Get page by ID
+      tags:
+        - Pages (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pageId
+          in: path
+          description: ID of the page to return
+          required: true
+          example: blog
+          schema:
+            $ref: '#/components/schemas/GetPageByIdDTO'
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: Page with such id (`pageId`) does not exist
+        '500':
+          description: Internal server error
+          
+    #---------------------------- Update page (admin) ------------------------
+    patch:
+      operationId: Update page (admin)
+      summary: Update page
+      tags:
+        - Pages (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pageId
+          in: path
+          description: ID of the page to update
+          required: true
+          example: 15748d0b-d8d6-4e69-b88b-986e593549b7
+          schema:
+            type: string
+            format: uuid
+            
+      requestBody:
+        required: false
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePageDTO'
+              
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: Page with such id (`pageId`) does not exist
+        '500':
+          description: Internal server error
+          
+    #---------------------------- Delete page by ID (admin) ------------------
+    delete:
+      operationId: Delete page by ID (admin)
+      summary: Delete page by ID
+      description: Will not delete if page has children
+      tags:
+        - Pages (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pageId
+          in: path
+          description: ID of the page to delete
+          required: true
+          example: 76de756b-274e-4dd7-b7cb-10541d747d56
+          schema:
+            $ref: '#/components/schemas/DeletePageDTO'
+  
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: Page with such id (`pageId`) does not exist
+        '500':         
+          description: Internal server error
+          
+  #---------------------------- Upload image (admin) -------------------------
+  /admin/pages/{pageId}/upload:
+    post:
+      operationId: Upload image (admin)
+      summary: Upload image
+      description: Upload image
+      tags:
+        - Pages (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pageId
+          in: path
+          description: ID of the page
+          required: true
+          example: 39bcf9d6-eacc-4483-8cbd-2c5cd53c3608
+          schema:
+            type: string
+            format: uuid
+            
+      requestBody:
+        required: true
+        description: request example
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+              
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 1681760142159imagename.jpeg
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (not userRole.ADMIN)
+        '404':
+          description: Page with such id (`id`) does not exist
+        '500':         
+          description: Internal server error
+          
+  # +++++++++++++++++++++++++++++++ P U B L I C +++++++++++++++++++++++++++++++
+  
+  #---------------------------- Register user ---------------------------------
+  /public/auth/register:
+    post:
+      operationId: Registration
+      summary: Register user
+      description: Default userRole.USER & isActive = true
+      tags:
+        - Auth (public)
+      security: []
+      parameters: []
+      
+      requestBody:
+        required: true
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDTO'
+              
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenJWT'
+        '400':
+          description: Invalid request OR
+                       User with email - [`email`] already exists
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Login user (all) -----------------------------
+  /public/auth/login:
+    post:
+      operationId: Login user (all)
+      summary: Login user
+      tags:
+        - Auth (public)
+      security: []
+      parameters: []
+      
+      requestBody:
+        required: true
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDTO'
+              
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenJWT'
+        '400':
+          description: Invalid request
+        '401':
+          description: Wrong password
+        '404':
+          description: User with email [`email`] does not exist
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Get current user (public) --------------------
+  /public/auth/current-user:
+    get:
+      operationId: Get current user (public)
+      summary: Get current user
+      description: Get authorized current user
+      tags:
+        - Auth (public)
+      security:
+        - bearerAuth: []
+      parameters: []
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: User with id - [`id`] does not exist",
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Update user (public) ------------------------- 
+  /public/auth/update-user:
+    patch:
+      operationId: Update user (public)
+      summary: Update user
+      description: Update authorized current user
+      tags:
+        - Auth (public)
+      security:
+        - bearerAuth: []
+      parameters: []
+
+      requestBody:
+        required: false
+        description: request example
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDTO'
+              
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: User with id - [`id`] does not exist",
+        '500':
+          description: Internal server error
+          
+  #---------------------------- Get routes (public) --------------------------
+  /public/pages:
+    get:
+      operationId: Get routes (public)
+      summary: Get routes
+      description: Get routes
+      tags:
+        - Pages (public)
+      security: []
+      parameters: []
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoutesDTO'
+        '500':
+          description: Internal server error
+
+  #---------------------------- Get page by slug (public) --------------------
+  /public/pages/{slug}:
+    get:
+      operationId: Get page by slug (public)
+      summary: Get page by slug
+      tags:
+        - Pages (public)
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          description: slug of the page to return
+          required: true
+          example: blog
+          schema:
+            $ref: '#/components/schemas/GetPageBySlugDTO'
+  
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDTO'
+        '404':
+          description: Page with such slug (`slug`) does not exist
+        '500':
+          description: Internal server error
+
+  #---------------------------- Get page children (public) ------------------
+  /public/pages/{slug}/children:
+    get:
+      operationId: Get page children (public)
+      summary: Get page children
+      tags:
+        - Pages (public)
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          description: slug of the parent page
+          required: true
+          example: blog
+          schema:
+            $ref: '#/components/schemas/GetPageBySlugDTO'
+        - name: page
+          in: query
+          description: Page number
+          example: 1
+          schema:
+            type: integer
+            format: int
+            default: 1
+        - name: perPage
+          in: query
+          description: Per page number
+          example: 10
+          schema:
+            type: integer
+            format: int
+            default: 10
+  
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildrenDTO'
+        '400':
+          description: Invalid request
+        '404':
+          description: Page with such id (`pageId`) does not exist
+        '500':
+          description: Internal server error   
+          
+# -----------------------------------------------------------------------------

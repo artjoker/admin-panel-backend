@@ -1,0 +1,1 @@
+export { ImageDTO } from './image';
